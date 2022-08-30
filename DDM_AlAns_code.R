@@ -846,69 +846,114 @@ ggarrange(a,p + facet_grid(. ~ sex_male) +
 
 
 
+# Drift Rate _____________________________________________________________
+
+  # All participants
+
+cc <- reshape2::melt(dd[,c("record_id", "v1", "v2", "icu_total")], 
+                     id.vars = c("record_id", "icu_total"), 
+                     variable.name = "trial")
+
+a<-ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
+  geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
+  theme_classic() + 
+  ylab("Drift Rate") + 
+  xlab("Callous-Unemotional Traits") + 
+  scale_colour_manual(name="Drift", breaks = c("v1", "v2"), 
+                      labels= c("Self", "Red Cross"), 
+                      values=c("blue", "steel blue"), 
+                      aesthetics = c("colour", "fill")) + 
+  theme(legend.position = "")   + 
+  scale_linetype_discrete(name="Drift", breaks = c("v1", "v2"), 
+                          labels= c("Self", "Red Cross") )
+
+
+  # Males and females 
+cc <- reshape2::melt(dd[,c("record_id", "v1", "v2", "icu_total", "sex_male")], 
+                     id.vars = c("record_id", "icu_total", "sex_male"), 
+                     variable.name = "trial")
+
+cc$sex_male <- car::recode(dd$sex_male, "0='Female'; 1= 'Male'")
+
+p <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
+  geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
+  theme_classic() + 
+  ylab("Drift Rate") + 
+  xlab("Callous-Unemotional Traits") + 
+  scale_colour_manual(name="Drift", breaks = c("v1", "v2"), 
+                      labels= c("Self", "Red Cross"), 
+                      values=c("blue", "steel blue"), 
+                      aesthetics = c("colour", "fill")) + 
+  theme(legend.position = c(0.65, 0.15))   +
+  scale_linetype_discrete(name="Drift", breaks = c("v1", "v2"), 
+                          labels= c("Self", "Red Cross") )
+
+  # putting plots together
+
+ggarrange(a,p + facet_grid(. ~ sex_male) +
+            theme(strip.text.x = element_text(
+              size = 12, color = "black", face = "bold"),
+              strip.background = element_rect(
+                color="black", fill="White", size=1.5, linetype="solid"
+              )
+            ),
+          labels = c("A", "B")
+)
 
 
 
 
+## Bias ___________________________________________________________________
+
+cc <- reshape2::melt(dd[,c("record_id", "z1", "z2", "icu_total")], 
+                     id.vars = c("record_id", "icu_total"), 
+                     variable.name = "trial")
+
+a<-ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
+  geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
+  theme_classic() + 
+  ylab("Bias") + 
+  xlab("Callous-Unemotional Traits") + 
+  scale_colour_manual(name="Bias", breaks = c("z1", "z2"), 
+                      labels= c("Self", "Red Cross"), 
+                      values=c("blue", "steel blue"), 
+                      aesthetics = c("colour", "fill")) + 
+  theme(legend.position ="" )   + 
+  scale_linetype_discrete(name="Bias", breaks = c("z1", "z2"), 
+                          labels= c("Self", "Red Cross") )
 
 
+# Males and females 
+cc <- reshape2::melt(dd[,c("record_id", "z1", "z2", "icu_total", "sex_male")], 
+                     id.vars = c("record_id", "icu_total", "sex_male"), 
+                     variable.name = "trial")
 
+cc$sex_male <- car::recode(dd$sex_male, "0='Female'; 1= 'Male'")
 
+p <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
+  geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
+  theme_classic() + 
+  ylab("Bias") + 
+  xlab("Callous-Unemotional Traits") + 
+  scale_colour_manual(name="Bias", breaks = c("z1", "z2"), 
+                      labels= c("Self", "Red Cross"), 
+                      values=c("blue", "steel blue"), 
+                      aesthetics = c("colour", "fill")) + 
+  theme(legend.position = c(0.85, 0.15))   +
+  scale_linetype_discrete(name="Bias", breaks = c("z1", "z2"), 
+                          labels= c("Self", "Red Cross") )
 
+  # putting plots together
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ggarrange(a,p + facet_grid(. ~ sex_male) +
+            theme(strip.text.x = element_text(
+              size = 12, color = "black", face = "bold"),
+              strip.background = element_rect(
+                color="black", fill="White", size=1.5, linetype="solid"
+              )
+            ),
+          labels = c("A", "B")
+)
 
 
 
