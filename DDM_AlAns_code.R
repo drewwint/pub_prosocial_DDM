@@ -387,6 +387,461 @@ ols_vif_tol(assumpt<-lm(random ~ icu_total + age + sex_male + race_White + sdq_t
 
 
 
+# Measures Reliability Alpha
+## ICU
+psych::alpha(dats[,c(grepl( "ICU." , names( dats ) ))],check.keys=TRUE)
+  # alpha 0.82
+psych::describe(dats$icu_total)
+
+
+## SDQ - CD
+psych::alpha(dats[,c(grepl( "sdq" , names( dats ) ))],check.keys=TRUE)
+  # alpha 0.75
+psych::describe(dats$sdq_total_cd)
+
+
+
+# correlation table 
+  # table of pearson
+Hmisc::rcorr(as.matrix(test_dat), type =  "pearson")
+  # table of spearman 
+Hmisc::rcorr(as.matrix(test_dat), type =  "spearman")
+
+
+
+## analyses
+  # without conduct 
+
+    ## within
+mod <- "
+a1 + a2  ~ icu_total + 
+            sex_male + 
+            age
+
+v1 + v2 ~ icu_total + 
+          sex_male + 
+          age 
+"
+sem_mod <- sem(mod,data= dd)
+cbind(data.frame(parameterestimates(sem_mod, standardize = TRUE, rsquare= TRUE))[c(1:12),1:3], 
+      round(data.frame(parameterestimates(sem_mod, standardize = TRUE, rsquare= TRUE))[c(1:12),4:11],3))
+
+    ## before
+mod <- "
+nd_mean_1 + nd_mean_2  ~ icu_total + 
+            sex_male + 
+            age
+
+z1 + z2 ~ icu_total + 
+          sex_male + 
+          age 
+"
+sem_mod <- sem(mod,data= dd)
+cbind(data.frame(parameterestimates(sem_mod, standardize = TRUE, rsquare= TRUE))[c(1:12),1:3], 
+      round(data.frame(parameterestimates(sem_mod, standardize = TRUE, rsquare= TRUE))[c(1:12),4:11],3))
+
+
+  # with conduct
+    ## within
+mod <- "
+a1 + a2  ~ icu_total + 
+            sex_male + 
+            age +
+            sdq_total_cd.
+            
+v1 + v2 ~ icu_total + 
+          sex_male + 
+          age + 
+          sdq_total_cd
+
+"
+sem_mod_c <- sem(mod,data= dd)
+cbind(data.frame(parameterestimates(sem_mod_c, standardize = TRUE, rsquare= TRUE))[c(1:12),1:3], 
+      round(data.frame(parameterestimates(sem_mod_c, standardize = TRUE, rsquare= TRUE))[c(1:12),4:11],3))
+
+    ## before
+mod <- "
+
+nd_mean_1 + nd_mean_2  ~ icu_total + 
+            sex_male + 
+            age +
+            sdq_total_cd  
+
+z1 + z2 ~ icu_total + 
+          sex_male + 
+          age + 
+          sdq_total_cd
+"
+
+sem_mod_c <- sem(mod,data= dd)
+cbind(data.frame(parameterestimates(sem_mod_c, standardize = TRUE, rsquare= TRUE))[c(1:12),1:3], 
+      round(data.frame(parameterestimates(sem_mod_c, standardize = TRUE, rsquare= TRUE))[c(1:12),4:11],3))
+  ## non-decision time related to CD exclusively 
+
+
+    # we found no evidence of a suppression effect- so we will only report on those analyses with conduct as a control
+
+
+
+  # final models
+    ## Final within
+mod_f_av <- "
+a1 + a2  ~ icu_total + 
+            sex_male + 
+            age +
+            sdq_total_cd
+            
+v1 + v2 ~ icu_total + 
+          sex_male + 
+          age + 
+          sdq_total_cd
+
+"
+sem_mod_f_av <- sem(mod_f_av,data= dd)
+h1 <- cbind(data.frame(parameterestimates(sem_mod_f_av, standardize = TRUE, rsquare= TRUE))[c(1:12),1:3], 
+      round(data.frame(parameterestimates(sem_mod_f_av, standardize = TRUE, rsquare= TRUE))[c(1:12),4:11],3))
+h1
+    ## Final before
+mod_f_nd <- "
+
+nd_mean_1 + nd_mean_2  ~ icu_total + 
+            sex_male + 
+            age +
+            sdq_total_cd  
+
+z1 + z2 ~ icu_total + 
+          sex_male + 
+          age + 
+          sdq_total_cd
+"
+
+sem_mod_f_nd <- sem(mod_f_nd,data= dd)
+h2 <- cbind(data.frame(parameterestimates(sem_mod_f_nd, standardize = TRUE, rsquare= TRUE))[c(1:12),1:3], 
+      round(data.frame(parameterestimates(sem_mod_f_nd, standardize = TRUE, rsquare= TRUE))[c(1:12),4:11],3))
+h2
+
+
+
+
+
+                  #### examining moderation by sex ####
+# within
+  # Full multigroup model
+mod_sex <- "
+a1 + a2  ~ icu_total +
+            age +
+            sdq_total_cd
+            
+v1 + v2 ~ icu_total +
+          age + 
+          sdq_total_cd
+"
+
+sem_mod_sex <- sem(mod_sex,data= dd, group = "sex_male",check.gradient = FALSE)
+
+
+multg <- cbind(data.frame(parameterestimates(sem_mod_sex, standardize = TRUE, rsquare= TRUE))[c(1:12, 81:84,41:52, 85:88),1:3], 
+      round(data.frame(parameterestimates(sem_mod_sex, standardize = TRUE, rsquare= TRUE))[c(1:12, 81:84,41:52, 85:88),c(4,6:11,13)],3))
+multg$block <- car::recode(multg$block, "1='male';2='female'")
+multg
+
+
+
+
+  #Probing sex differences 
+    # Now to probe which parameters sex is different
+
+mod_sex_a1 <- "
+a1   ~ a*icu_total +      ## diff
+           age + 
+           sdq_total_cd
+a2  ~ icu_total + 
+           age + 
+           sdq_total_cd 
+
+v1 + v2   ~ icu_total + 
+            age + 
+            sdq_total_cd
+"
+
+sem_mod_sex_a1 <- sem(mod_sex_a1,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex,sem_mod_sex_a1)
+
+  ## YES there is a difference
+
+
+mod_sex_a1 <- "
+a1   ~ icu_total + 
+           age + 
+           a*sdq_total_cd  ## diff
+a2  ~ icu_total + 
+           age + 
+           sdq_total_cd 
+
+v1 + v2   ~ icu_total + 
+            age + 
+            sdq_total_cd
+"
+
+sem_mod_sex_a1 <- sem(mod_sex_a1,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex,sem_mod_sex_a1)
+
+
+mod_sex_a2 <- "
+a1   ~ icu_total + 
+           age + 
+           sdq_total_cd
+a2  ~ a*icu_total +       ## diff
+           age + 
+           sdq_total_cd      
+
+v1 + v2   ~ icu_total + 
+            age + 
+            sdq_total_cd
+
+"
+
+sem_mod_sex_a2 <- sem(mod_sex_a2,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex,sem_mod_sex_a2)
+
+  # NOPE
+
+
+
+mod_sex_v1 <- "
+a1 + a2  ~ icu_total + 
+           age + 
+           sdq_total_cd
+            
+v1    ~ a*icu_total +     ## diff
+            age + 
+            sdq_total_cd
+
+v2   ~ icu_total + 
+            age + 
+            sdq_total_cd
+"
+
+sem_mod_sex_v1 <- sem(mod_sex_v1,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex,sem_mod_sex_v1)
+
+  # NOPE
+
+
+mod_sex_v2 <- "
+
+a1 + a2  ~ icu_total + 
+           age + 
+           sdq_total_cd
+            
+v1    ~ icu_total + 
+            age + 
+            sdq_total_cd
+
+v2   ~ a*icu_total +      ## diff
+            age + 
+            sdq_total_cd
+
+"
+
+sem_mod_sex_v2 <- sem(mod_sex_v2,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex,sem_mod_sex_v2)
+
+  # Yes there is a difference 
+
+
+  # results of moderation for within DDM model stats
+      # all in all we see that sex differences in a1 threshold separation and v2 drift
+  
+
+
+# before
+mod_sex2 <- "
+nd_mean_1 + nd_mean_2  ~ icu_total +
+            age +
+            sdq_total_cd
+            
+z1 + z2 ~ icu_total +
+          age + 
+          sdq_total_cd
+"
+
+sem_mod_sex2 <- sem(mod_sex2,data= dd, group = "sex_male",check.gradient = FALSE)
+
+multg2 <- cbind(data.frame(parameterestimates(sem_mod_sex2, standardize = TRUE, rsquare= TRUE))[c(1:12, 71:74,36:47, 75:78),1:3], 
+                round(data.frame(parameterestimates(sem_mod_sex2, standardize = TRUE, rsquare= TRUE))[c(1:12, 71:74,36:47, 75:78),c(4,6:11,13)],3))
+multg2$block <- car::recode(multg2$block, "1='male';2='female'")
+multg2
+
+
+mod_sex_nd1 <- "
+nd_mean_1 ~ a*icu_total +
+            age +
+            sdq_total_cd
+
+nd_mean_2  ~ icu_total +
+            age +
+            sdq_total_cd
+            
+z1 + z2 ~ icu_total +
+          age + 
+          sdq_total_cd
+"
+sem_mod_sex_nd1 <- sem(mod_sex_nd1,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex2,sem_mod_sex_nd1)
+    # nope
+
+mod_sex_nd2 <- "
+nd_mean_1 ~ icu_total +
+            age +
+            sdq_total_cd
+
+nd_mean_2  ~ a*icu_total +
+            age +
+            sdq_total_cd
+            
+z1 + z2 ~ icu_total +
+          age + 
+          sdq_total_cd
+"
+sem_mod_sex_nd2 <- sem(mod_sex_nd2,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex2,sem_mod_sex_nd2)
+
+    # nope
+
+
+mod_sex_diff <- "
+nd_mean_1 + nd_mean_2 ~ icu_total +
+            age +
+            sdq_total_cd
+            
+z1 ~ a*icu_total +   ## diff
+          age + 
+          sdq_total_cd
+
+z2 ~ icu_total +
+          age + 
+          sdq_total_cd
+
+"
+sem_mod_sex_diff <- sem(mod_sex_diff,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex2,sem_mod_sex_diff)
+    ## yes there is a difference 
+
+
+
+    ##thresholdd on cd
+mod_sex_diff <- "
+nd_mean_1 + nd_mean_2 ~ icu_total +
+            age +
+            sdq_total_cd
+            
+z1 ~ icu_total + 
+          age + 
+          a*sdq_total_cd   ## diff
+
+z2 ~ icu_total +
+          age + 
+          sdq_total_cd
+
+"
+sem_mod_sex_diff <- sem(mod_sex_diff,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex2,sem_mod_sex_diff)
+    ## NOPE
+
+
+
+
+mod_sex_diff2 <- "
+nd_mean_1 + nd_mean_2 ~ icu_total +
+            age +
+            sdq_total_cd.
+            
+z1 ~ icu_total +
+          age + 
+          sdq_total_cd
+
+z2 ~ a*icu_total +    ## diff
+          age + 
+          sdq_total_cd
+
+"
+sem_mod_sex_diff2 <- sem(mod_sex_diff2,data= dd, group = "sex_male",check.gradient = FALSE)
+
+lavTestLRT(sem_mod_sex2,sem_mod_sex_diff2)
+
+    # NOPE
+
+
+
+                        #### Plotting ####
+
+# threshold separation ___________________________________________________
+
+  # all participants 
+cc <- reshape2::melt(dd[,c("record_id", "a1", "a2", "icu_total")], 
+                     id.vars = c("record_id", "icu_total"), 
+                     variable.name = "trial")
+
+
+a <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
+  geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
+  theme_classic() + 
+  ylab("Threshold Separation") + 
+  xlab("Callous-Unemotional Traits") + 
+  scale_colour_manual(name="Threshold Separation", breaks = c("a1", "a2"), 
+                      labels= c("Self", "Red Cross"), 
+                      values=c("blue", "steel blue"), 
+                      aesthetics = c("colour", "fill")) + 
+  theme(legend.position = "")   + #c(0.65, 0.12)
+  scale_linetype_discrete(name="Threshold Separation", breaks = c("a1", "a2"), 
+                          labels= c("Self", "Red Cross") )
+
+
+  # Males and females
+cc <- reshape2::melt(dd[,c("record_id", "a1", "a2", "icu_total", "sex_male")], 
+                     id.vars = c("record_id", "icu_total", "sex_male"), 
+                     variable.name = "trial")
+
+cc$sex_male <- car::recode(dd$sex_male, "0='Female'; 1= 'Male'")
+
+p <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
+  geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
+  theme_classic() + 
+  ylab("Threshold Separation") + 
+  xlab("Callous-Unemotional Traits") + 
+  scale_colour_manual(name="Threshold Separation", breaks = c("a1", "a2"), 
+                      labels= c("Self", "Red Cross"), 
+                      values=c("blue", "steel blue"), 
+                      aesthetics = c("colour", "fill")) + 
+  theme(legend.position = c(0.75, 0.15))   + 
+  scale_linetype_discrete(name="Threshold Separation", breaks = c("a1", "a2"), 
+                          labels= c("Self", "Red Cross") ) 
+
+
+  # putting plots together 
+ggarrange(a,p + facet_grid(. ~ sex_male) +
+            theme(strip.text.x = element_text(
+              size = 12, color = "black", face = "bold"),
+              strip.background = element_rect(
+                color="black", fill="White", size=1.5, linetype="solid"
+              )
+            ),
+          labels = c("A", "B")
+)
+
+
+
+
 
 
 
