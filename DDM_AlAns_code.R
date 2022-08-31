@@ -266,6 +266,67 @@ dd <- cbind(dd, nds)
 
 
 
+# Demographic info
+
+  ## Age
+psych::describe(dd$age)
+
+
+  ## Sex
+a<-rbind(table(dd$sex_male),round((table(dd$sex_male)/sum(table(dd$sex_male))*100),0))
+colnames(a)<-c('female','male')
+rownames(a)<-c('n','%')
+a
+
+
+  ## High to normative CU
+a<-rbind(table(dd$cu_group_9split),round((table(dd$cu_group_9split)/sum(table(dd$cu_group_9split))*100),0))
+colnames(a)<-c('low_CU','hi_CU')
+rownames(a)<-c('n','%')
+a
+
+  # those in high CU and high CD
+    ## sum of high CD
+sum(dd$sdq_cd) #3
+    ## table of those high CD and CU
+a <- table(dd$cu_group_9split, dd$sdq_cd)
+colnames(a) <- c("low_CD", "hi_CD")
+rownames(a) <- c('low_CU','hi_CU')
+a
+
+  ## Race & Ethnicity
+    ### Multiple races
+
+over_1_race<-which((dd$race_Asian)+(dd$race_Indian)+(dd$race_Black)+
+                     (dd$race_PacificIsland)+(dd$race_White)+
+                     (dd$race_other)>1)
+    ### # of participants who selected more than one race 
+length(over_1_race)
+round(length(over_1_race)/NROW(dd)*100,2)
+
+
+    ### Describing all races
+
+
+race<-(1*dd$race_Asian)+(2*dd$race_Indian)+(3*dd$race_Black)+
+  (5*dd$race_PacificIsland)+(6*dd$race_White)+
+  (7*dd$race_other)
+
+    ## race # and proportion
+a<-rbind(as.character(table(race)),round((table(race)/sum(table(race))*100),2))
+rownames(a)<-c("n","%")
+a
+
+
+    ### Ethnicity 
+
+a<-rbind(as.character(table(dd$race_Latino)),round((table(dd$race_Latino)/sum(table(dd$race_Latino))*100),3))
+colnames(a) <-c("non-latinx", "latinx")
+rownames(a) <- c("n","%")
+a
+
+
+
 
 
 
