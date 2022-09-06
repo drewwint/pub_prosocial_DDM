@@ -559,8 +559,8 @@ v1 + v2 ~ icu_total +
 
 "
 sem_mod_f_av <- sem(mod_f_av,data= dd)
-h1 <- cbind(data.frame(parameterestimates(sem_mod_f_av, standardize = TRUE, rsquare= TRUE))[c(1:12),1:3], 
-      round(data.frame(parameterestimates(sem_mod_f_av, standardize = TRUE, rsquare= TRUE))[c(1:12),4:11],3))
+h1 <- cbind(data.frame(parameterestimates(sem_mod_f_av, standardize = TRUE, rsquare= TRUE))[c(1:16, 42:45),1:3], 
+      round(data.frame(parameterestimates(sem_mod_f_av, standardize = TRUE, rsquare= TRUE))[c(1:16, 42:45),4:11],5))
 h1
     ## Final before
 mod_f_nd <- "
@@ -577,8 +577,8 @@ z1 + z2 ~ icu_total +
 "
 
 sem_mod_f_nd <- sem(mod_f_nd,data= dd)
-h2 <- cbind(data.frame(parameterestimates(sem_mod_f_nd, standardize = TRUE, rsquare= TRUE))[c(1:12),1:3], 
-      round(data.frame(parameterestimates(sem_mod_f_nd, standardize = TRUE, rsquare= TRUE))[c(1:12),4:11],3))
+h2 <- cbind(data.frame(parameterestimates(sem_mod_f_nd, standardize = TRUE, rsquare= TRUE))[c(1:16, 37:40),1:3], 
+      round(data.frame(parameterestimates(sem_mod_f_nd, standardize = TRUE, rsquare= TRUE))[c(1:16, 37:40),4:11],5))
 h2
 
 
@@ -734,8 +734,8 @@ z1 + z2 ~ icu_total +
 
 sem_mod_sex2 <- sem(mod_sex2,data= dd, group = "sex_male",check.gradient = FALSE)
 
-multg2 <- cbind(data.frame(parameterestimates(sem_mod_sex2, standardize = TRUE, rsquare= TRUE))[c(1:12, 71:74,36:47, 75:78),1:3], 
-                round(data.frame(parameterestimates(sem_mod_sex2, standardize = TRUE, rsquare= TRUE))[c(1:12, 71:74,36:47, 75:78),c(4,6:11,13)],3))
+multg2 <- cbind(data.frame(parameterestimates(sem_mod_sex2, standardize = TRUE, rsquare= TRUE))[c(1:12, 81:84, 41:52, 85:88),1:3], 
+                round(data.frame(parameterestimates(sem_mod_sex2, standardize = TRUE, rsquare= TRUE))[c(1:12, 81:84, 41:52, 85:88),c(4,6:11,13)],3))
 multg2$block <- car::recode(multg2$block, "1='male';2='female'")
 multg2
 
@@ -857,13 +857,13 @@ cc <- reshape2::melt(dd[,c("record_id", "a1", "a2", "icu_total")],
 a <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
   geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
   theme_classic() + 
-  ylab("Threshold Separation") + 
-  xlab("Callous-Unemotional Traits") + 
+  ylab("") + 
+  xlab("") + 
   scale_colour_manual(name="Threshold Separation", breaks = c("a1", "a2"), 
                       labels= c("Self", "Red Cross"), 
                       values=c("blue", "steel blue"), 
                       aesthetics = c("colour", "fill")) + 
-  theme(legend.position = "")   + #c(0.65, 0.12)
+  theme(legend.position = "")   + 
   scale_linetype_discrete(name="Threshold Separation", breaks = c("a1", "a2"), 
                           labels= c("Self", "Red Cross") )
 
@@ -878,8 +878,9 @@ cc$sex_male <- car::recode(dd$sex_male, "0='Female'; 1= 'Male'")
 p <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
   geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
   theme_classic() + 
-  ylab("Threshold Separation") + 
-  xlab("Callous-Unemotional Traits") + 
+  theme(axis.text.y = element_blank()) +
+  ylab("") + 
+  xlab("") + 
   scale_colour_manual(name="Threshold Separation", breaks = c("a1", "a2"), 
                       labels= c("Self", "Red Cross"), 
                       values=c("blue", "steel blue"), 
@@ -890,15 +891,23 @@ p <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linety
 
 
   # putting plots together 
-ggarrange(a,p + facet_grid(. ~ sex_male) +
-            theme(strip.text.x = element_text(
-              size = 12, color = "black", face = "bold"),
-              strip.background = element_rect(
-                color="black", fill="White", size=1.5, linetype="solid"
-              )
-            ),
-          labels = c("A", "B")
-)
+z <- ggarrange(a,p + facet_grid(. ~ sex_male) +
+                 theme(strip.text.x = element_text(
+                   size = 12, color = "black", face = "bold"),
+                   strip.background = element_rect(
+                     color="black", fill="White", size=1.5, linetype="solid"
+                   )
+                 ),
+               labels = c("A", "B") 
+) 
+
+a1 <- annotate_figure(z, left = text_grob("Threshold Separation", face = "bold", size = 12,rot = 90, vjust=2.5, hjust = 0.4),
+                      bottom = text_grob("Callous-Unemotional Traits", face = "bold", size = 12, vjust = -1.5))
+a1
+
+
+# ggsave(path = "C:\\Users\\wintersd\\OneDrive - The University of Colorado Denver\\1 Publications\\ppr5_DDM\\pub_prosocial_DDM\\figures", plot=a1, width = 6.6, height = 3, filename = "threshold.tiff", device='tiff', dpi=700, limitsize = FALSE)
+
 
 
 
@@ -918,8 +927,8 @@ cc <- reshape2::melt(dd[,c("record_id", "v1", "v2", "icu_total")],
 a<-ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
   geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
   theme_classic() + 
-  ylab("Drift Rate") + 
-  xlab("Callous-Unemotional Traits") + 
+  ylab("") + 
+  xlab("") + 
   scale_colour_manual(name="Drift", breaks = c("v1", "v2"), 
                       labels= c("Self", "Red Cross"), 
                       values=c("blue", "steel blue"), 
@@ -939,8 +948,9 @@ cc$sex_male <- car::recode(dd$sex_male, "0='Female'; 1= 'Male'")
 p <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
   geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
   theme_classic() + 
-  ylab("Drift Rate") + 
-  xlab("Callous-Unemotional Traits") + 
+  theme(axis.text.y = element_blank()) +
+  ylab("") + 
+  xlab("") + 
   scale_colour_manual(name="Drift", breaks = c("v1", "v2"), 
                       labels= c("Self", "Red Cross"), 
                       values=c("blue", "steel blue"), 
@@ -951,15 +961,21 @@ p <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linety
 
   # putting plots together
 
-ggarrange(a,p + facet_grid(. ~ sex_male) +
-            theme(strip.text.x = element_text(
-              size = 12, color = "black", face = "bold"),
-              strip.background = element_rect(
-                color="black", fill="White", size=1.5, linetype="solid"
-              )
-            ),
-          labels = c("A", "B")
-)
+z <- ggarrange(a,p + facet_grid(. ~ sex_male) +
+                 theme(strip.text.x = element_text(
+                   size = 12, color = "black", face = "bold"),
+                   strip.background = element_rect(
+                     color="black", fill="White", size=1.5, linetype="solid"
+                   )
+                 ),
+               labels = c("A", "B") 
+) 
+
+a2 <- annotate_figure(z, left = text_grob("Drift Rate", face = "bold", size = 12,rot = 90, vjust=2.5, hjust = 0.1),
+                      bottom = text_grob("Callous-Unemotional Traits", face = "bold", size = 12, vjust = -1.5))
+a2
+
+# ggsave(path = "C:\\Users\\wintersd\\OneDrive - The University of Colorado Denver\\1 Publications\\ppr5_DDM\\pub_prosocial_DDM\\figures", plot=a2, width = 6.6, height = 3, filename = "drift.tiff", device='tiff', dpi=700, limitsize = FALSE)
 
 
 
@@ -973,8 +989,8 @@ cc <- reshape2::melt(dd[,c("record_id", "z1", "z2", "icu_total")],
 a<-ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
   geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
   theme_classic() + 
-  ylab("Bias") + 
-  xlab("Callous-Unemotional Traits") + 
+  ylab("") + 
+  xlab("") + 
   scale_colour_manual(name="Bias", breaks = c("z1", "z2"), 
                       labels= c("Self", "Red Cross"), 
                       values=c("blue", "steel blue"), 
@@ -994,8 +1010,9 @@ cc$sex_male <- car::recode(dd$sex_male, "0='Female'; 1= 'Male'")
 p <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linetype=trial)) + 
   geom_smooth( method = "lm", formula = 'y ~ x', se= T, size =2, alpha = 0.3,aes(fill= trial)) +
   theme_classic() + 
-  ylab("Bias") + 
-  xlab("Callous-Unemotional Traits") + 
+  theme(axis.text.y = element_blank()) +
+  ylab("") + 
+  xlab("") + 
   scale_colour_manual(name="Bias", breaks = c("z1", "z2"), 
                       labels= c("Self", "Red Cross"), 
                       values=c("blue", "steel blue"), 
@@ -1006,15 +1023,22 @@ p <- ggplot(cc, aes(x = icu_total, y= value, group = trial, color= trial, linety
 
   # putting plots together
 
-ggarrange(a,p + facet_grid(. ~ sex_male) +
-            theme(strip.text.x = element_text(
-              size = 12, color = "black", face = "bold"),
-              strip.background = element_rect(
-                color="black", fill="White", size=1.5, linetype="solid"
-              )
-            ),
-          labels = c("A", "B")
-)
+z <- ggarrange(a,p + facet_grid(. ~ sex_male) +
+                 theme(strip.text.x = element_text(
+                   size = 12, color = "black", face = "bold"),
+                   strip.background = element_rect(
+                     color="black", fill="White", size=1.5, linetype="solid"
+                   )
+                 ),
+               labels = c("A", "B") 
+) 
+
+a3 <- annotate_figure(z, left = text_grob("Bias", face = "bold", size = 12,rot = 90, vjust=2.5, hjust = 0),
+                      bottom = text_grob("Callous-Unemotional Traits", face = "bold", size = 12, vjust = -1.5))
+
+a3
+
+# ggsave(path = "C:\\Users\\wintersd\\OneDrive - The University of Colorado Denver\\1 Publications\\ppr5_DDM\\figures", plot=a3, width = 6.6, height = 3, filename = "bias.tiff", device='tiff', dpi=700, limitsize = FALSE)
 
 
 
