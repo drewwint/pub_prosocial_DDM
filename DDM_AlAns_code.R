@@ -2,7 +2,7 @@
 
 ###############################################################################
 #                                                                             #
-#    Cognitive processes underlying                                           #
+#    Cognitive mechanisms underlying                                          #
 #    prosocial decision making in callous-unemotional traits                  #
 #                                                                             #
 #     Drew E Winters, PhD.                                                    #
